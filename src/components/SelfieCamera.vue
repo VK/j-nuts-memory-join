@@ -1,6 +1,6 @@
 <template>
   <div class="card w-100 p-1">
-    {{videoWidth}} x  {{videoHeight}}
+    {{ videoWidth }} x {{ videoHeight }}
     <div class="camera-button mt-2 mb-2">
       <button
         class="btn btn-primary"
@@ -23,12 +23,11 @@
       <div class="camera-shutter" :class="{ flash: isShotPhoto }"></div>
 
       <div id="videobox">
-        <div id="region" v-show="!isPhotoTaken"></div>
         <video
           v-show="!isPhotoTaken"
           ref="camera"
           :width="300"
-          :height="225"
+          :height="300"
           autoplay
         ></video>
 
@@ -37,7 +36,7 @@
           id="photoTaken"
           ref="canvas"
           :width="300"
-          :height="225"
+          :height="300"
         ></canvas>
       </div>
     </div>
@@ -62,6 +61,7 @@
             placeholder="Vorname"
             aria-label="Vorname"
             aria-describedby="basic-addon1"
+            v-model="nameA"
           />
         </div>
       </div>
@@ -77,16 +77,21 @@
             placeholder="Nachname"
             aria-label="Nachname"
             aria-describedby="basic-addon2"
+            v-model="nameB"
           />
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary lowerform">Submit</button>
+      <button type="submit" class="btn btn-primary lowerform"
+      
+      @click="sendData"
+      >Submit</button>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -120,9 +125,9 @@ export default {
       const constraints = (window.constraints = {
         audio: false,
         video: {
-          width: 800,
-          height: 600,
-          facingMode: 'user'
+          width: 300,
+          height: 300,
+          facingMode: "user",
         },
       });
 
@@ -169,21 +174,19 @@ export default {
       this.videoHeight = video.videoHeight;
 
       console.log(video.videoWidth, video.videoHeight);
-      canvas.getContext('2d').drawImage(video, 0, 0);
-
-
-
+      canvas.getContext("2d").drawImage(video, 0, 0);
     },
 
-    downloadImage() {
-      const download = document.getElementById("downloadPhoto");
-      const canvas = document
-        .getElementById("photoTaken")
-        .toDataURL("image/jpeg")
-        .replace("image/jpeg", "image/octet-stream");
-      download.setAttribute("href", canvas);
-    },
-  },
+    sendData() {
+
+      let data = {
+        name: this.nameA + " " + this.nameB,
+        img: this.$refs.canvas.toDataURL()
+      }
+      console.log(data);
+    }
+
+  }
 };
 </script>
 
@@ -211,7 +214,7 @@ body {
 .web-camera-container .camera-box .camera-shutter {
   opacity: 0;
   width: 300px;
-  height: 225px;
+  height: 300px;
   background-color: #fff;
   position: absolute;
 }
@@ -223,18 +226,8 @@ body {
 
 #videobox {
   width: 300px;
-  height: 225px;
+  height: 300px;
   position: relative;
-}
-
-#region {
-  border: solid red;
-  width: 200px;
-  height: 200px;
-  position: absolute;
-  top: 12px;
-  left: 50px;
-  z-index: 1000;
 }
 
 #videobox video {
