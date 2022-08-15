@@ -1,5 +1,5 @@
 <template>
-  <div class="card w-100 p-1">
+  <div class="card p-1" style="max-width: 500px">
     <div class="camera-button mt-2 mb-2">
       <button
         class="btn btn-primary"
@@ -12,6 +12,16 @@
     </div>
 
     <div v-show="isCameraOpen && isLoading" class="camera-loading"></div>
+
+    <div v-if="!isCameraOpen" class="p-2">
+      <p style="text-align: left">
+        Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir nur ein Bild
+        und deinen Namen.<br />
+        Dazu musst du nur die Kamera deines Handys aktivieren, ein Photo machen,
+        deinen Vor- und Nachnamen eingeben und abschicken.<br />
+        Dann ist dein Bild auch im nächsten Memory mit dabei.
+      </p>
+    </div>
 
     <div
       v-if="isCameraOpen"
@@ -81,14 +91,22 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary lowerform" @click="sendData">
+      <button type="submit" class="btn btn-primary lowerform mb-3" @click="sendData">
         Submit
       </button>
+
+      <div class="alert alert-success" role="alert" v-if="isOk">
+         Daten erfolgreich hochgeladen.
+      </div>
+      <div class="alert alert-danger" role="alert" v-if="isError">
+        Probleme beim Upload. Bitte nochmal probieren.
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -97,9 +115,16 @@ export default {
       isShotPhoto: false,
       isLoading: false,
 
+      isOk: false,
+      isError: false,
+
+      nameA: "",
+      nameB: "",
+
       link: "#",
     };
   },
+
 
   methods: {
     toggleCamera() {
@@ -113,6 +138,7 @@ export default {
         this.createCameraElement();
       }
     },
+
 
     createCameraElement() {
       this.isLoading = true;
@@ -168,29 +194,27 @@ export default {
       canvas.getContext("2d").drawImage(video, 0, 0);
     },
 
+    async internalSendData(sendData) {
+      const response = await fetch("https://j-nuts-cal.herokuapp.com/memory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sendData),
+      });
+
+      return response.ok
+    },
     sendData() {
       let sendData = {
         name: this.nameA + " " + this.nameB,
         img: this.$refs.canvas.toDataURL(),
       };
 
-      async function test() {
-        const response = await fetch(
-          "https://j-nuts-cal.herokuapp.com/memory",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(sendData),
-          }
-        );
-        if (response.ok) {
-          console.log("it worked");
-        }
-      }
-
-      test();
+      this.internalSendData(sendData).then(res => {
+        this.isOk = res;
+        this.isError = !res;
+      });
     },
   },
 };
@@ -226,6 +250,11 @@ body {
 }
 
 .camera-box {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card {
   margin-left: auto;
   margin-right: auto;
 }
