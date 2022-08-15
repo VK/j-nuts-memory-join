@@ -1,6 +1,5 @@
 <template>
   <div class="card w-100 p-1">
-    {{ videoWidth }} x {{ videoHeight }}
     <div class="camera-button mt-2 mb-2">
       <button
         class="btn btn-primary"
@@ -82,16 +81,14 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary lowerform"
-      
-      @click="sendData"
-      >Submit</button>
+      <button type="submit" class="btn btn-primary lowerform" @click="sendData">
+        Submit
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -99,8 +96,6 @@ export default {
       isPhotoTaken: false,
       isShotPhoto: false,
       isLoading: false,
-      videoWidth: "?",
-      videoHeight: "?",
 
       link: "#",
     };
@@ -170,23 +165,34 @@ export default {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      this.videoWidth = video.videoWidth;
-      this.videoHeight = video.videoHeight;
-
-      console.log(video.videoWidth, video.videoHeight);
       canvas.getContext("2d").drawImage(video, 0, 0);
     },
 
     sendData() {
-
-      let data = {
+      let sendData = {
         name: this.nameA + " " + this.nameB,
-        img: this.$refs.canvas.toDataURL()
-      }
-      console.log(data);
-    }
+        img: this.$refs.canvas.toDataURL(),
+      };
 
-  }
+      async function test() {
+        const response = await fetch(
+          "https://j-nuts-cal.herokuapp.com/memory",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendData),
+          }
+        );
+        if (response.ok) {
+          console.log("it worked");
+        }
+      }
+
+      test();
+    },
+  },
 };
 </script>
 
