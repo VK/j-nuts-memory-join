@@ -1,5 +1,6 @@
 <template>
   <div class="card w-100 p-1">
+    {{videoWidth}} x  {{videoHeight}}
     <div class="camera-button mt-2 mb-2">
       <button
         class="btn btn-primary"
@@ -93,6 +94,9 @@ export default {
       isPhotoTaken: false,
       isShotPhoto: false,
       isLoading: false,
+      videoWidth: "?",
+      videoHeight: "?",
+
       link: "#",
     };
   },
@@ -118,6 +122,7 @@ export default {
         video: {
           width: 800,
           height: 600,
+          facingMode: 'user'
         },
       });
 
@@ -154,9 +159,20 @@ export default {
       }
 
       this.isPhotoTaken = !this.isPhotoTaken;
-      const context = this.$refs.canvas.getContext("2d");
 
-      context.drawImage(this.$refs.camera, 0, 0, 300, 225);
+      let canvas = this.$refs.canvas;
+      let video = this.$refs.camera;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      this.videoWidth = video.videoWidth;
+      this.videoHeight = video.videoHeight;
+
+      console.log(video.videoWidth, video.videoHeight);
+      canvas.getContext('2d').drawImage(video, 0, 0);
+
+
+
     },
 
     downloadImage() {
@@ -318,3 +334,4 @@ body {
   margin-right: auto;
 }
 </style>
+
