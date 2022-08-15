@@ -116,8 +116,8 @@ export default {
       const constraints = (window.constraints = {
         audio: false,
         video: {
-          width: { ideal: 800 },
-          height: { ideal: 600 },
+          width: 800,
+          height: 600,
         },
       });
 
