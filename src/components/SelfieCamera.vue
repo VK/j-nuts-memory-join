@@ -26,8 +26,8 @@
         <video
           v-show="!isPhotoTaken"
           ref="camera"
-          :width="450"
-          :height="337.5"
+          :width="300"
+          :height="225"
           autoplay
         ></video>
 
@@ -35,13 +35,13 @@
           v-show="isPhotoTaken"
           id="photoTaken"
           ref="canvas"
-          :width="450"
-          :height="337.5"
+          :width="300"
+          :height="225"
         ></canvas>
       </div>
     </div>
 
-    <div v-if="isCameraOpen && !isLoading" class="camera-shoot">
+    <div v-if="isCameraOpen && !isLoading" class="camera-shoot mt-2">
       <button type="button" class="btn btn-primary" @click="takePhoto">
         <img
           src="https://img.icons8.com/material-outlined/40/ffffff/camera--v2.png"
@@ -71,9 +71,11 @@ export default {
       isPhotoTaken: false,
       isShotPhoto: false,
       isLoading: false,
-      link: "#",
+      link: "#"
     };
   },
+
+  
 
   methods: {
     toggleCamera() {
@@ -131,7 +133,7 @@ export default {
       this.isPhotoTaken = !this.isPhotoTaken;
       const context = this.$refs.canvas.getContext("2d");
 
-      context.drawImage(this.$refs.camera, 0, 0, 450, 337.5);
+      context.drawImage(this.$refs.camera, 0, 0, 300, 225);
     },
 
     downloadImage() {
@@ -169,8 +171,8 @@ body {
 }
 .web-camera-container .camera-box .camera-shutter {
   opacity: 0;
-  width: 450px;
-  height: 337.5px;
+  width: 300px;
+  height: 225px;
   background-color: #fff;
   position: absolute;
 }
@@ -181,18 +183,18 @@ body {
 }
 
 #videobox {
-  width: 450px;
-  height: 337.5px;
+  width: 300px;
+  height: 225px;
   position: relative;
 }
 
 #region {
   border: solid red;
-  width: 300px;
-  height: 300px;
+  width: 200px;
+  height: 200px;
   position: absolute;
-  top: 20px;
-  left: 75px;
+  top: 12px;
+  left: 50px;
   z-index: 1000;
 }
 
