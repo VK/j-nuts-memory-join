@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 p-5">
+  <div class="w-100 p-1">
   <SelfieCamera/>
   </div>
 </template>

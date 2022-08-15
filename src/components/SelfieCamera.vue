@@ -1,5 +1,5 @@
 <template>
-  <div class="card w-100 p-2">
+  <div class="card w-100 p-1">
     <div class="camera-button mt-2 mb-2">
       <button
         class="btn btn-primary"
@@ -35,8 +35,8 @@
           v-show="isPhotoTaken"
           id="photoTaken"
           ref="canvas"
-          :width="300"
-          :height="300"
+          :width="450"
+          :height="337.5"
         ></canvas>
       </div>
     </div>
@@ -131,7 +131,7 @@ export default {
       this.isPhotoTaken = !this.isPhotoTaken;
       const context = this.$refs.canvas.getContext("2d");
 
-      context.drawImage(this.$refs.camera, 110, 35, 420, 420, 0, 0, 300, 300);
+      context.drawImage(this.$refs.camera, 0, 0, 450, 337.5);
     },
 
     downloadImage() {
@@ -205,8 +205,8 @@ body {
 
 #videobox canvas {
   position: absolute;
-  top: 20px;
-  left: 75px;
+  top: 0;
+  left: 0;
   z-index: 1100;
 }
 
