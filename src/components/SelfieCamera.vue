@@ -50,15 +50,37 @@
     </div>
 
     <div v-if="isPhotoTaken && isCameraOpen" class="camera-download">
-      <a
-        id="downloadPhoto"
-        download="my-photo.jpg"
-        class="button"
-        role="button"
-        @click="downloadImage"
-      >
-        Download
-      </a>
+      <div class="mt-2 lowerform">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Vorname</span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Vorname"
+            aria-label="Vorname"
+            aria-describedby="basic-addon1"
+          />
+        </div>
+      </div>
+
+      <div class="mt-2 lowerform">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon2">Nachname</span>
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nachname"
+            aria-label="Nachname"
+            aria-describedby="basic-addon2"
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary lowerform">Submit</button>
     </div>
   </div>
 </template>
@@ -71,11 +93,9 @@ export default {
       isPhotoTaken: false,
       isShotPhoto: false,
       isLoading: false,
-      link: "#"
+      link: "#",
     };
   },
-
-  
 
   methods: {
     toggleCamera() {
@@ -95,7 +115,10 @@ export default {
 
       const constraints = (window.constraints = {
         audio: false,
-        video: true,
+        video: {
+          width: { ideal: 800 },
+          height: { ideal: 600 },
+        },
       });
 
       navigator.mediaDevices
@@ -212,7 +235,6 @@ body {
   z-index: 1100;
 }
 
-
 .web-camera-container .camera-box .camera-shutter.flash {
   opacity: 1;
 }
@@ -288,5 +310,11 @@ body {
   100% {
     opacity: 1;
   }
+}
+
+.lowerform {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
