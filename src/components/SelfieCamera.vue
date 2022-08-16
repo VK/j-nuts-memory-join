@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <div v-if="isCameraOpen && !isLoading" class="camera-shoot mt-2">
+    <div v-if="isCameraOpen && !isLoading" class="camera-shoot mt-2 mb-2">
       <button type="button" class="btn btn-primary" @click="takePhoto">
         <img
           src="https://img.icons8.com/material-outlined/40/ffffff/camera--v2.png"
@@ -91,7 +91,7 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary lowerform mb-3" @click="sendData">
+      <button type="submit" class="btn btn-primary lowerform mb-3"  @click="sendData" :disabled="isSendDisabled">
         Submit
       </button>
 
@@ -117,6 +117,8 @@ export default {
 
       isOk: false,
       isError: false,
+
+      isSendDisabled: false,
 
       nameA: "",
       nameB: "",
@@ -192,6 +194,11 @@ export default {
       canvas.height = video.videoHeight;
 
       canvas.getContext("2d").drawImage(video, 0, 0);
+      this.isSendDisabled = false;
+      this.nameA = "";
+      this.nameB = "";
+      this.isOk = false;
+      this.isError = false;
     },
 
     async internalSendData(sendData) {
@@ -206,6 +213,8 @@ export default {
       return response.ok
     },
     sendData() {
+      this.isSendDisabled = true;
+
       let sendData = {
         name: this.nameA + " " + this.nameB,
         img: this.$refs.canvas.toDataURL(),
