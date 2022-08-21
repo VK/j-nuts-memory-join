@@ -15,8 +15,8 @@
 
     <div v-if="!isCameraOpen" class="p-2">
       <p style="text-align: left">
-        Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir nur ein Bild
-        und deinen Namen.<br />
+        Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir ein Bild
+        und deinen Namen.<br /><br />
         Dazu musst du nur die Kamera deines Handys aktivieren, ein Photo machen,
         deinen Vor- und Nachnamen eingeben und abschicken.<br />
         Dann ist dein Bild auch im nächsten Memory mit dabei.
