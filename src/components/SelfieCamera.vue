@@ -6,8 +6,8 @@
         :class="{ 'is-primary': !isCameraOpen, 'is-danger': isCameraOpen }"
         @click="toggleCamera"
       >
-        <span v-if="!isCameraOpen">Open Camera</span>
-        <span v-else>Close Camera</span>
+        <span v-if="!isCameraOpen">Kamera öffnen</span>
+        <span v-else>Kamera schließen</span>
       </button>
     </div>
 
@@ -58,7 +58,8 @@
       </button>
     </div>
 
-    <div v-if="isPhotoTaken && isCameraOpen" class="camera-download">
+    <!-- v-if="isPhotoTaken && isCameraOpen"  -->
+    <div v-if="isCameraOpen && !isLoading" class="camera-upload">
       <div class="mt-2 lowerform">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -91,12 +92,17 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary lowerform mb-3"  @click="sendData" :disabled="isSendDisabled">
-        Submit
+      <button
+        type="submit"
+        class="btn btn-primary lowerform mb-3"
+        @click="sendData"
+        :disabled="isSendDisabled || !(isPhotoTaken && isCameraOpen) || nameA.length == 0 || nameB.length == 0"
+      >
+        Abschicken
       </button>
 
       <div class="alert alert-success" role="alert" v-if="isOk">
-         Daten erfolgreich hochgeladen.
+        Daten erfolgreich hochgeladen.
       </div>
       <div class="alert alert-danger" role="alert" v-if="isError">
         Probleme beim Upload. Bitte nochmal probieren.
@@ -106,7 +112,6 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -127,7 +132,6 @@ export default {
     };
   },
 
-
   methods: {
     toggleCamera() {
       if (this.isCameraOpen) {
@@ -140,7 +144,6 @@ export default {
         this.createCameraElement();
       }
     },
-
 
     createCameraElement() {
       this.isLoading = true;
@@ -210,17 +213,23 @@ export default {
         body: JSON.stringify(sendData),
       });
 
-      return response.ok
+      return response.ok;
     },
     sendData() {
       this.isSendDisabled = true;
+
+      if (this.nameA.length == 0 || this.nameB.length == 0) {
+        this.isOk = false;
+        this.isError = true;
+        return;
+      }
 
       let sendData = {
         name: this.nameA + " " + this.nameB,
         img: this.$refs.canvas.toDataURL(),
       };
 
-      this.internalSendData(sendData).then(res => {
+      this.internalSendData(sendData).then((res) => {
         this.isOk = res;
         this.isError = !res;
       });
