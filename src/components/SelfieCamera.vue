@@ -1,8 +1,18 @@
 <template>
   <div class="card p-1" style="max-width: 500px">
-    <div class="camera-button mt-2 mb-2">
+    <div v-if="!isCameraOpen && !isFileSelected" class="p-2">
+      <p style="text-align: left">
+        Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir ein Bild und
+        deinen Namen.<br /><br />
+        Dazu musst du nur die Kamera deines Handys aktivieren, oder ein Bild
+        hochladen. Deinen Vor- und Nachnamen eingeben und abschicken.<br />
+        Dann ist dein Bild auch im nächsten Memory mit dabei.
+      </p>
+    </div>
+
+    <div class="camera-button mt-2 mb-2 p-2" v-if="!isFileSelected">
       <button
-        class="btn btn-primary"
+        class="btn btn-primary w-100"
         :class="{ 'is-primary': !isCameraOpen, 'is-danger': isCameraOpen }"
         @click="toggleCamera"
       >
@@ -11,16 +21,24 @@
       </button>
     </div>
 
-    <div v-show="isCameraOpen && isLoading" class="camera-loading"></div>
-
-    <div v-if="!isCameraOpen" class="p-2">
-      <p style="text-align: left">
-        Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir ein Bild
-        und deinen Namen.<br /><br />
-        Dazu musst du nur die Kamera deines Handys aktivieren, ein Photo machen,
-        deinen Vor- und Nachnamen eingeben und abschicken.<br />
-        Dann ist dein Bild auch im nächsten Memory mit dabei.
-      </p>
+    <div v-if="!isCameraOpen">
+      <vue-avatar-editor
+        v-show="!isImageFinished"
+        :width="300"
+        :height="300"
+        ref="vueavatar"
+        finishText="Bild verwenden"
+        @select-file="onSelectFile($event)"
+        @finished="imageFinshed($event)"
+      >
+      </vue-avatar-editor>
+      <canvas
+        v-show="isImageFinished"
+        id="imageFinished"
+        ref="canvas2"
+        :width="300"
+        :height="300"
+      ></canvas>
     </div>
 
     <div
@@ -50,6 +68,8 @@
       </div>
     </div>
 
+    <div v-show="isCameraOpen && isLoading" class="camera-loading"></div>
+
     <div v-if="isCameraOpen && !isLoading" class="camera-shoot mt-2 mb-2">
       <button type="button" class="btn btn-primary" @click="takePhoto">
         <img
@@ -59,7 +79,10 @@
     </div>
 
     <!-- v-if="isPhotoTaken && isCameraOpen"  -->
-    <div v-if="isCameraOpen && !isLoading" class="camera-upload">
+    <div
+      v-if="(isCameraOpen && !isLoading) || isImageFinished"
+      class="camera-upload"
+    >
       <div class="mt-2 lowerform">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -96,7 +119,12 @@
         type="submit"
         class="btn btn-primary lowerform mb-3"
         @click="sendData"
-        :disabled="isSendDisabled || !(isPhotoTaken && isCameraOpen) || nameA.length == 0 || nameB.length == 0"
+        :disabled="
+          isSendDisabled ||
+          (!(isPhotoTaken && isCameraOpen) && !isImageFinished) ||
+          nameA.length == 0 ||
+          nameB.length == 0
+        "
       >
         Abschicken
       </button>
@@ -112,13 +140,20 @@
 </template>
 
 <script>
+import { VueAvatarEditor } from "vue-avatar-editor-improved";
+
 export default {
+  components: {
+    VueAvatarEditor,
+  },
   data() {
     return {
       isCameraOpen: false,
       isPhotoTaken: false,
       isShotPhoto: false,
       isLoading: false,
+      isFileSelected: false,
+      isImageFinished: false,
 
       isOk: false,
       isError: false,
@@ -129,10 +164,29 @@ export default {
       nameB: "",
 
       link: "#",
+      rotation: 0,
+      scale: 1,
+
+      imageBlob: undefined,
     };
   },
 
   methods: {
+    imageFinshed(new_canvas) {
+      this.isImageFinished = true;
+      let canvas = this.$refs.canvas2;
+      canvas.getContext("2d").drawImage(new_canvas, 0, 0);
+
+      this.isSendDisabled = false;
+      this.nameA = "";
+      this.nameB = "";
+      this.isOk = false;
+      this.isError = false;
+    },
+    onSelectFile() {
+      this.isFileSelected = true;
+    },
+
     toggleCamera() {
       if (this.isCameraOpen) {
         this.isCameraOpen = false;
@@ -226,8 +280,13 @@ export default {
 
       let sendData = {
         name: this.nameA + " " + this.nameB,
-        img: this.$refs.canvas.toDataURL(),
       };
+
+      if (this.isImageFinished) {
+        sendData["img"] = this.$refs.canvas2.toDataURL();
+      } else {
+        sendData["img"] = this.$refs.canvas.toDataURL();
+      }
 
       this.internalSendData(sendData).then((res) => {
         this.isOk = res;
