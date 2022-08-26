@@ -1,6 +1,6 @@
 <template>
   <div class="card p-1" style="max-width: 500px">
-    <div v-if="!isCameraOpen && !isFileSelected" class="p-2">
+    <div v-if="!isCameraOpen && !isFileSelected && !isImageLoaded" class="p-2">
       <p style="text-align: left">
         Um beim J🌰 Memory-Spiel mitbachen zu können brauchen wir ein Bild und
         deinen Namen.<br /><br />
@@ -10,7 +10,7 @@
       </p>
     </div>
 
-    <div class="camera-button mt-2 mb-2 p-2" v-if="!isFileSelected">
+    <div class="camera-button mt-2 mb-2 p-2" v-if="!isFileSelected && !isImageLoaded">
       <button
         class="btn btn-primary w-100"
         :class="{ 'is-primary': !isCameraOpen, 'is-danger': isCameraOpen }"
@@ -19,17 +19,29 @@
         <span v-if="!isCameraOpen">Kamera öffnen</span>
         <span v-else>Kamera schließen</span>
       </button>
+
+      <input
+        id="fileUpload"
+        type="file"
+        @change="loadFile"
+        accept="image/jpeg, image/png"
+        hidden
+      />
+      <button class="btn mt-2 btn-primary w-100" @click="chooseFile()" v-show="!isCameraOpen">
+        Bild aussuchen
+      </button>
     </div>
 
     <div v-if="!isCameraOpen">
       <vue-avatar-editor
-        v-show="!isImageFinished"
+        v-show="!isImageFinished && isImageLoaded"
         :width="300"
         :height="300"
         ref="vueavatar"
         finishText="Bild verwenden"
         @select-file="onSelectFile($event)"
         @finished="imageFinshed($event)"
+        image="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/800px-Image_created_with_a_mobile_phone.png"
       >
       </vue-avatar-editor>
       <canvas
@@ -49,7 +61,7 @@
     >
       <div class="camera-shutter" :class="{ flash: isShotPhoto }"></div>
 
-      <div id="videobox">
+      <div id="videobox" class="p-2">
         <video
           v-show="!isPhotoTaken"
           ref="camera"
@@ -81,9 +93,9 @@
     <!-- v-if="isPhotoTaken && isCameraOpen"  -->
     <div
       v-if="(isCameraOpen && !isLoading) || isImageFinished"
-      class="camera-upload"
+      class="camera-upload p-2"
     >
-      <div class="mt-2 lowerform">
+      <div class="mt-2 lowerform ">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Vorname</span>
@@ -117,7 +129,7 @@
 
       <button
         type="submit"
-        class="btn btn-primary lowerform mb-3"
+        class="btn btn-primary lowerform mb-3 w-100"
         @click="sendData"
         :disabled="
           isSendDisabled ||
@@ -142,6 +154,7 @@
 <script>
 import { VueAvatarEditor } from "vue-avatar-editor-improved";
 
+
 export default {
   components: {
     VueAvatarEditor,
@@ -153,6 +166,8 @@ export default {
       isShotPhoto: false,
       isLoading: false,
       isFileSelected: false,
+
+      isImageLoaded: false,
       isImageFinished: false,
 
       isOk: false,
@@ -172,6 +187,27 @@ export default {
   },
 
   methods: {
+    chooseFile() {
+      document.getElementById("fileUpload").click();
+    },
+
+    loadFile(event) {
+      const testfile = event.target.files[0];
+
+      const reader = new FileReader();
+      reader.readAsDataURL(testfile);
+      reader.onload = (e) => {
+        this.$refs.vueavatar.$el.classList.add("p-2");
+        const ch = this.$refs.vueavatar.$el.children;
+        const b = ch[ch.length -1];
+        b.classList.add("btn", "btn-primary", "w-100" , "mb-1");
+        console.log(b);
+        this.isImageLoaded = true;
+        this.$refs.vueavatar.$refs.vueavatar.loadImage(e.target.result);
+                
+      };
+    },
+
     imageFinshed(new_canvas) {
       this.isImageFinished = true;
       let canvas = this.$refs.canvas2;
