@@ -10,7 +10,10 @@
       </p>
     </div>
 
-    <div class="camera-button mt-2 mb-2 p-2" v-if="!isFileSelected && !isImageLoaded">
+    <div
+      class="camera-button mt-2 mb-2 p-2"
+      v-if="!isFileSelected && !isImageLoaded"
+    >
       <button
         class="btn btn-primary w-100"
         :class="{ 'is-primary': !isCameraOpen, 'is-danger': isCameraOpen }"
@@ -27,8 +30,21 @@
         accept="image/jpeg, image/png"
         hidden
       />
-      <button class="btn mt-2 btn-primary w-100" @click="chooseFile()" v-show="!isCameraOpen">
-        Bild aussuchen
+      <button
+        class="btn mt-2 btn-primary w-100"
+        @click="chooseFile()"
+        v-show="!isCameraOpen"
+      >
+        Vorhandenes Bild hochladen
+      </button>
+    </div>
+
+    <div v-if="!isCameraOpen && isImageFinished || isImageLoaded" class="mb-2 p-2">
+      <button
+        class="btn mt-2 btn-primary w-100"
+        @click="restart()"
+      >
+        Zurück
       </button>
     </div>
 
@@ -38,7 +54,7 @@
         :width="300"
         :height="300"
         ref="vueavatar"
-        finishText="Bild verwenden"
+        finishText="Bild zuschneiden"
         @select-file="onSelectFile($event)"
         @finished="imageFinshed($event)"
         image="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/800px-Image_created_with_a_mobile_phone.png"
@@ -95,7 +111,7 @@
       v-if="(isCameraOpen && !isLoading) || isImageFinished"
       class="camera-upload p-2"
     >
-      <div class="mt-2 lowerform ">
+      <div class="mt-2 lowerform">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Vorname</span>
@@ -154,7 +170,6 @@
 <script>
 import { VueAvatarEditor } from "vue-avatar-editor-improved";
 
-
 export default {
   components: {
     VueAvatarEditor,
@@ -191,6 +206,17 @@ export default {
       document.getElementById("fileUpload").click();
     },
 
+    restart() {
+      this.isCameraOpen = false;
+      this.isPhotoTaken = false;
+      this.isShotPhoto = false;
+      this.isLoading = false;
+      this.isFileSelected = false;
+
+      this.isImageLoaded = false;
+      this.isImageFinished = false;
+    },
+
     loadFile(event) {
       const testfile = event.target.files[0];
 
@@ -199,12 +225,11 @@ export default {
       reader.onload = (e) => {
         this.$refs.vueavatar.$el.classList.add("p-2");
         const ch = this.$refs.vueavatar.$el.children;
-        const b = ch[ch.length -1];
-        b.classList.add("btn", "btn-primary", "w-100" , "mb-1");
+        const b = ch[ch.length - 1];
+        b.classList.add("btn", "btn-primary", "w-100", "mb-1");
         console.log(b);
         this.isImageLoaded = true;
         this.$refs.vueavatar.$refs.vueavatar.loadImage(e.target.result);
-                
       };
     },
 
