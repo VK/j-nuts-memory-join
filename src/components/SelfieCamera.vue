@@ -39,11 +39,11 @@
       </button>
     </div>
 
-    <div v-if="!isCameraOpen && isImageFinished || isImageLoaded" class="mb-2 p-2">
-      <button
-        class="btn mt-2 btn-primary w-100"
-        @click="restart()"
-      >
+    <div
+      v-if="(!isCameraOpen && isImageFinished) || isImageLoaded"
+      class="mb-2 p-2"
+    >
+      <button class="btn mt-2 btn-primary w-100" @click="restart()">
         Zurück
       </button>
     </div>
@@ -113,7 +113,7 @@
     >
       <div class="mt-2 lowerform">
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          <div class="input-group-prepend  w-25">
             <span class="input-group-text" id="basic-addon1">Vorname</span>
           </div>
           <input
@@ -122,14 +122,14 @@
             placeholder="Vorname"
             aria-label="Vorname"
             aria-describedby="basic-addon1"
-            v-model="nameA"
+            v-model="vorName"
           />
         </div>
       </div>
 
       <div class="mt-2 lowerform">
         <div class="input-group mb-3">
-          <div class="input-group-prepend">
+          <div class="input-group-prepend w-25">
             <span class="input-group-text" id="basic-addon2">Nachname</span>
           </div>
           <input
@@ -138,10 +138,32 @@
             placeholder="Nachname"
             aria-label="Nachname"
             aria-describedby="basic-addon2"
-            v-model="nameB"
+            v-model="nachName"
           />
         </div>
       </div>
+
+      <div class="mt-2 lowerform">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend w-25">
+            <span class="input-group-text" id="basic-addon3">Stimmgruppe</span>
+          </div>
+          <select
+            type="text"
+            class="form-control"
+            aria-label="Stimmgruppe"
+            aria-describedby="basic-addon3"
+            v-model="stimmGruppe"
+          >
+          <option value="Sopran" >Sopran</option>
+          <option value="Alt" >Alt</option>
+          <option value="Tenor" >Tenor</option>
+          <option value="Bass" >Bass</option>
+          </select>
+        </div>
+      </div>
+
+
 
       <button
         type="submit"
@@ -150,8 +172,9 @@
         :disabled="
           isSendDisabled ||
           (!(isPhotoTaken && isCameraOpen) && !isImageFinished) ||
-          nameA.length == 0 ||
-          nameB.length == 0
+          vorName.length == 0 ||
+          nachName.length == 0 ||
+          stimmGruppe.length == 0
         "
       >
         Abschicken
@@ -190,8 +213,9 @@ export default {
 
       isSendDisabled: false,
 
-      nameA: "",
-      nameB: "",
+      vorName: "",
+      nachName: "",
+      stimmGruppe: "",
 
       link: "#",
       rotation: 0,
@@ -239,8 +263,9 @@ export default {
       canvas.getContext("2d").drawImage(new_canvas, 0, 0);
 
       this.isSendDisabled = false;
-      this.nameA = "";
-      this.nameB = "";
+      this.vorName = "";
+      this.nachName = "";
+      this.stimmGruppe = "";
       this.isOk = false;
       this.isError = false;
     },
@@ -302,6 +327,11 @@ export default {
         setTimeout(() => {
           this.isShotPhoto = false;
         }, FLASH_TIMEOUT);
+      } else {
+      this.vorName = "";
+      this.nachName = "";
+      this.stimmGruppe = "";
+
       }
 
       this.isPhotoTaken = !this.isPhotoTaken;
@@ -313,13 +343,13 @@ export default {
 
       canvas.getContext("2d").drawImage(video, 0, 0);
       this.isSendDisabled = false;
-      this.nameA = "";
-      this.nameB = "";
+
       this.isOk = false;
       this.isError = false;
     },
 
     async internalSendData(sendData) {
+      try{
       const response = await fetch("https://j-nuts-cal.herokuapp.com/memory", {
         method: "POST",
         headers: {
@@ -329,18 +359,27 @@ export default {
       });
 
       return response.ok;
+      } catch {
+        return false;
+      }
     },
     sendData() {
       this.isSendDisabled = true;
 
-      if (this.nameA.length == 0 || this.nameB.length == 0) {
+      if (
+        this.vorName.length == 0 ||
+        this.nachName.length == 0 ||
+        this.stimmGruppe.length == 0
+      ) {
         this.isOk = false;
         this.isError = true;
         return;
       }
 
       let sendData = {
-        name: this.nameA + " " + this.nameB,
+        vorName: this.vorName,
+        nachName: this.nachName,
+        stimmGruppe: this.stimmGruppe,
       };
 
       if (this.isImageFinished) {
