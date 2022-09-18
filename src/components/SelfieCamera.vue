@@ -377,9 +377,9 @@ export default {
       }
 
       let sendData = {
-        vorName: this.vorName,
-        nachName: this.nachName,
-        stimmGruppe: this.stimmGruppe,
+        first: this.vorName,
+        last: this.nachName,
+        voice: this.stimmGruppe,
       };
 
       if (this.isImageFinished) {
