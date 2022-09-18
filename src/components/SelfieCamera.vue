@@ -350,7 +350,7 @@ export default {
 
     async internalSendData(sendData) {
       try{
-      const response = await fetch("https://j-nuts-cal.herokuapp.com/memory", {
+      const response = await fetch("https://jazznuts.krueckl.de/memory", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
